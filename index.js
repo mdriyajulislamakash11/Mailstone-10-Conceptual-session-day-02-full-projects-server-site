@@ -1,4 +1,5 @@
 const express = require("express");
+require("dotenv").config();
 const cors = require("cors");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const app = express();
@@ -10,11 +11,7 @@ app.use(express.json()); //express.json()    JSON ডেটাকে বুঝ�
 
 //Mongo DB conneted code:
 
-// M-10-Con-Sess-day-2
-// ZxHzRvg9KvlAruqL
-
-const uri =
-  "mongodb+srv://M-10-Con-Sess-day-2:ZxHzRvg9KvlAruqL@cluster0.zchez.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.zchez.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -43,8 +40,14 @@ async function run() {
 
     // get methods:
     app.get("/schedule", async (req, res) => {
-      const cursor = gymCollection.find();
-      const result = await cursor.toArray();
+      const { searchParams } = req.query;
+      let option = {};
+
+      if (searchParams) {
+        option = { title: { $regex: searchParams, $options: "i" } };
+      }
+
+      const result = await gymCollection.find(option).toArray();
       res.send(result);
     });
 
@@ -76,6 +79,7 @@ async function run() {
           date: updatedData.date,
           dayName: updatedData.dayName,
           time: updatedData.time,
+          isCompleted: false,
         },
       };
 
