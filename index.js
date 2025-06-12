@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const app = express();
 const port = process.env.PORT || 5000;
 
@@ -49,6 +49,14 @@ async function run() {
         res.send(result)
     } )
 
+    // dynamic id:
+    app.get("/schedue/:id", async (req, res) => {
+        const id = req.params.id;
+        const query = {_id : new ObjectId(id)}
+        const result = await gymCollection.findOne(query);
+        res.send(result)
+    })
+
     // Post Methods: 
     app.post("/schedule", async (req, res) => {
         const data = req.body;
@@ -56,7 +64,13 @@ async function run() {
         res.send(result)
     })
 
-
+    // Delete Methods: 
+    app.delete("/schedule/:id", async (req, res) => {
+        const id = req.params.id;
+        const query = {_id: new ObjectId(id)}
+        const result = await gymCollection.deleteOne(query)
+        res.send(result)
+    })
 
 
 
