@@ -31,15 +31,32 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
 
+      const gymCollection = client.db("gym-schedule").collection("schedule");
 
+    // Post man test purpose: ==>
+    // app.post("/data", (req, res) =>{
+    //     const data = req.body;
+    //     res.json({
+    //         status: true,
+    //         data : data,
+    //     })
+    // })
 
-    app.post("/data", (req, res) =>{
+    // get methods: 
+    app.get("/schedule", async (req, res) => {
+        const cursor = gymCollection.find()
+        const result = await cursor.toArray()
+        res.send(result)
+    } )
+
+    // Post Methods: 
+    app.post("/schedule", async (req, res) => {
         const data = req.body;
-        res.json({
-            status: true,
-            data : data,
-        })
+        const result = await gymCollection.insertOne(data);
+        res.send(result)
     })
+
+
 
 
 
