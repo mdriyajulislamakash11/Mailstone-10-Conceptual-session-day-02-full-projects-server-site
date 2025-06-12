@@ -11,8 +11,7 @@ app.use(express.json()); //express.json()    JSON ডেটাকে বুঝ�
 //Mongo DB conneted code:
 
 // M-10-Con-Sess-day-2
-// ZxHzRvg9KvlAruqL 
-
+// ZxHzRvg9KvlAruqL
 
 const uri =
   "mongodb+srv://M-10-Con-Sess-day-2:ZxHzRvg9KvlAruqL@cluster0.zchez.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
@@ -31,7 +30,7 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
 
-      const gymCollection = client.db("gym-schedule").collection("schedule");
+    const gymCollection = client.db("gym-schedule").collection("schedule");
 
     // Post man test purpose: ==>
     // app.post("/data", (req, res) =>{
@@ -42,37 +41,55 @@ async function run() {
     //     })
     // })
 
-    // get methods: 
+    // get methods:
     app.get("/schedule", async (req, res) => {
-        const cursor = gymCollection.find()
-        const result = await cursor.toArray()
-        res.send(result)
-    } )
+      const cursor = gymCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    });
 
     // dynamic id:
-    app.get("/schedue/:id", async (req, res) => {
-        const id = req.params.id;
-        const query = {_id : new ObjectId(id)}
-        const result = await gymCollection.findOne(query);
-        res.send(result)
-    })
+    app.get("/schedule/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await gymCollection.findOne(query);
+      res.send(result);
+    });
 
-    // Post Methods: 
+    // Post Methods:
     app.post("/schedule", async (req, res) => {
-        const data = req.body;
-        const result = await gymCollection.insertOne(data);
-        res.send(result)
-    })
+      const data = req.body;
+      const result = await gymCollection.insertOne(data);
+      res.send(result);
+    });
 
-    // Delete Methods: 
+    // Update (PUT) API
+    app.put("/schedule/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const updatedData = req.body;
+      const option = { upsert: true };
+      const updateDoc = {
+        $set: {
+          title: updatedData.title,
+          dayNumber: updatedData.dayNumber,
+          date: updatedData.date,
+          dayName: updatedData.dayName,
+          time: updatedData.time,
+        },
+      };
+
+      const result = await gymCollection.updateOne(filter, updateDoc, option);
+      res.send(result);
+    });
+
+    // Delete Methods:
     app.delete("/schedule/:id", async (req, res) => {
-        const id = req.params.id;
-        const query = {_id: new ObjectId(id)}
-        const result = await gymCollection.deleteOne(query)
-        res.send(result)
-    })
-
-
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await gymCollection.deleteOne(query);
+      res.send(result);
+    });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
